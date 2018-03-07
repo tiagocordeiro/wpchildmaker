@@ -20,10 +20,14 @@ def make_child(name=theme_name, customer=customer_name, site=customer_site):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-    file_footer = open('mychilds/' + theme_name + '/' + 'footer.php', 'w')
-    file_footer.write(template_footer.render(customer_name=customer_name))
+    f_footer = open('mychilds/' + theme_name + '/' + 'footer.php', 'w')
+    f_footer.write(template_footer.render(customer_name=customer_name))
 
-    print(name, customer, site)
+    f_functions = open('mychilds/' + theme_name + '/' + 'functions.php', 'w')
+    f_functions.write(template_functions.render(customer_site=customer_site))
+
+    f_style = open('mychilds/' + theme_name + '/' + 'style.css', 'w')
+    f_style.write(template_style.render(theme_name=theme_name))
 
 
 if __name__ == '__main__':
