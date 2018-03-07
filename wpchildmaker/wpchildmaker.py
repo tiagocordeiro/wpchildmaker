@@ -25,8 +25,6 @@ def make_child(name=theme_name, customer=customer_name, site=customer_site):
 
     print(name, customer, site)
 
-    print(file_footer)
-
 
 if __name__ == '__main__':
     make_child()
