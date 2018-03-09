@@ -1,13 +1,16 @@
 import jinja2
-import sys
+import click
 import os
 
-theme_name = sys.argv[1]
-customer_name = sys.argv[2]
-customer_site = sys.argv[3]
 
-
-def make_child(name=theme_name, customer=customer_name, site=customer_site):
+@click.command()
+@click.option('--theme_name', prompt='Child theme name',
+              help='Não use espaço ou caracteres especiais')
+@click.option('--customer_name', prompt='Customer name',
+              help='Nome do cliente')
+@click.option('--customer_site', prompt='url do site',
+              help='ex. https://www.mulhergorila.com')
+def make_child(theme_name, customer_name, customer_site):
     env = jinja2.Environment()
     env.loader = jinja2.FileSystemLoader("templates/")
     template_footer = env.get_template("footer.php")
