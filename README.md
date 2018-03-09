@@ -28,7 +28,13 @@ Acesse o diretório e rode o script com os argumentos.
 
 ```
 cd wpchildmaker
-python wpchildmaker.py "MeuTema" "Meu Cliente" "https://www.mulhergorila.com"
+python wpchildmaker.py --theme_name "MeuTema" --customer_name "Meu Cliente" --customer_site "https://www.mulhergorila.com"
+```
+
+Ou, simplesmente:
+
+```
+python wpchildmaker.py
 ```
 
 Pronto, o seu tema filho foi criado no diretório `wpchildmaker/mychilds`
