@@ -1,6 +1,10 @@
 # wpchildmaker
 Gera arquivos de tema filho para o Divi no Wordpress
 
+[![Build Status](https://travis-ci.org/tiagocordeiro/wpchildmaker.svg?branch=master)](https://travis-ci.org/tiagocordeiro/wpchildmaker)
+[![Updates](https://pyup.io/repos/github/tiagocordeiro/wpchildmaker/shield.svg)](https://pyup.io/repos/github/tiagocordeiro/wpchildmaker/)
+[![Python 3](https://pyup.io/repos/github/tiagocordeiro/wpchildmaker/python-3-shield.svg)](https://pyup.io/repos/github/tiagocordeiro/wpchildmaker/)
+
 
 ## Como usar
 
