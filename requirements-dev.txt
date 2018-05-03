@@ -1,4 +1,4 @@
-attrs==17.4.0
+attrs==18.1.0
 flake8==3.5.0
 mccabe==0.6.1
 more-itertools==4.1.0
