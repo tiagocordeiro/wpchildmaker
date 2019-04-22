@@ -1,69 +1,85 @@
+from halo import Halo
 from zipfile import ZipFile
 import jinja2
 import click
+import shutil
 import os
+import sys
 
 
 @click.command()
-@click.option('--theme_name', prompt='Child theme name',
-              help='Não use espaço ou caracteres especiais')
-@click.option('--customer_name', prompt='Customer name',
-              help='Nome do cliente')
-@click.option('--customer_site', prompt='url do site',
-              help='ex. https://www.mulhergorila.com')
-def make_child(theme_name, customer_name, customer_site):
+@click.option(
+    "--theme_name",
+    prompt="Child theme name",
+    help="Não use espaço ou caracteres especiais",
+)
+@click.option("--customer_name", prompt="Customer name", help="Nome do cliente")
+@click.option(
+    "--customer_site", prompt="url do site", help="ex. https://www.mulhergorila.com"
+)
+@click.option("--template", prompt="Template name", help="ex. Divi", default="Divi")
+def make_child(theme_name, customer_name, customer_site, template):
+    pathname = os.path.dirname(sys.argv[0])
+    template_dir = os.path.abspath(pathname) + "/templates/" + template
+    template_files = os.listdir(template_dir)
     env = jinja2.Environment()
-    env.loader = jinja2.FileSystemLoader("templates/")
-    template_footer = env.get_template("footer.php")
-    template_functions = env.get_template("functions.php")
-    template_style = env.get_template("style.css")
+    env.loader = jinja2.FileSystemLoader(template_dir)
 
-    child_path = "mychilds/" + theme_name + "/"
+    spinner = Halo(text="Loading", spinner="dots")
+    spinner.start()
+
+    child_path = os.path.abspath(pathname) + "/mychilds/" + theme_name + "/"
     directory = os.path.dirname(child_path)
 
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-    f_footer = open('mychilds/' + theme_name + '/' + 'footer.php', 'w')
-    f_footer.write(template_footer.render(customer_name=customer_name))
-    f_footer.close()
-
-    f_functions = open('mychilds/' + theme_name + '/' + 'functions.php', 'w')
-    f_functions.write(template_functions.render(customer_site=customer_site))
-    f_functions.close()
-
-    f_style = open('mychilds/' + theme_name + '/' + 'style.css', 'w')
-    f_style.write(template_style.render(theme_name=theme_name))
-    f_style.close()
+    for file in template_files:
+        if file.endswith(".jpg") or file.endswith(".png"):
+            shutil.copy2(template_dir + "/" + file, directory)
+            spinner.succeed("Arquivo " + file + " Copiado")
+        else:
+            template_file = env.get_template(file)
+            template_writer = open("mychilds/" + theme_name + "/" + file, "w")
+            template_writer.write(
+                template_file.render(
+                    theme_name=theme_name,
+                    customer_name=customer_name,
+                    customer_site=customer_site,
+                )
+            )
+            spinner.succeed("Arquivo " + file + " Gerado")
 
     ziparchive(theme_name)
+    spinner.stop()
 
 
 def ziparchive(theme_name):
     # initializing empty file paths list
     file_paths = []
-    os.chdir('./mychilds/')
+    os.chdir("./mychilds/")
+    spinner_zip = Halo(text="Compactando arquivos", spinner="dots")
 
     # crawling through directory and subdirectories
-    for root, directories, files in os.walk('./' + theme_name + '/'):
+    for root, directories, files in os.walk("./" + theme_name + "/"):
         for filename in files:
             # join the two strings in order to form the full filepath.
             filepath = os.path.join(root, filename)
             file_paths.append(filepath)
 
     # printing the list of all files to be zipped
-    print('Following files will be zipped:')
+    spinner_zip.info("Following files will be zipped:")
     for file_name in file_paths:
-        print(file_name)
+        spinner_zip.info("Arquivo" + file_name + " OK")
 
     # writing files to a zipfile
-    with ZipFile('./' + theme_name + '.zip', 'w') as zip:
+    with ZipFile("./" + theme_name + ".zip", "w") as zip:
         # writing each file one by one
         for file in file_paths:
             zip.write(file)
 
-    print('All files zipped successfully!')
+    spinner_zip.succeed("All files zipped successfully!")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     make_child()
