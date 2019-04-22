@@ -1,32 +1,27 @@
-from halo import Halo
-from zipfile import ZipFile
-import jinja2
-import click
-import shutil
 import os
+import shutil
 import sys
+from zipfile import ZipFile
+
+import click
+import jinja2
+from halo import Halo
 
 
 @click.command()
-@click.option(
-    "--theme_name",
-    prompt="Child theme name",
-    help="Não use espaço ou caracteres especiais",
-)
+@click.option("--theme_name", prompt="Child theme name", help="Não use espaço ou caracteres especiais")
 @click.option("--customer_name", prompt="Customer name", help="Nome do cliente")
-@click.option(
-    "--customer_site", prompt="url do site", help="ex. https://www.mulhergorila.com"
-)
+@click.option("--customer_site", prompt="url do site", help="ex. https://www.mulhergorila.com")
 @click.option("--template", prompt="Template name", help="ex. Divi", default="Divi")
 def make_child(theme_name, customer_name, customer_site, template):
+    spinner = Halo(text="Loading", spinner="dots")
+    spinner.start()
+
     pathname = os.path.dirname(sys.argv[0])
     template_dir = os.path.abspath(pathname) + "/templates/" + template
     template_files = os.listdir(template_dir)
     env = jinja2.Environment()
     env.loader = jinja2.FileSystemLoader(template_dir)
-
-    spinner = Halo(text="Loading", spinner="dots")
-    spinner.start()
 
     child_path = os.path.abspath(pathname) + "/mychilds/" + theme_name + "/"
     directory = os.path.dirname(child_path)
@@ -41,15 +36,12 @@ def make_child(theme_name, customer_name, customer_site, template):
         else:
             template_file = env.get_template(file)
             template_writer = open("mychilds/" + theme_name + "/" + file, "w")
-            template_writer.write(
-                template_file.render(
-                    theme_name=theme_name,
-                    customer_name=customer_name,
-                    customer_site=customer_site,
-                )
-            )
+            template_writer.write(template_file.render(theme_name=theme_name,
+                                                       customer_name=customer_name,
+                                                       customer_site=customer_site, ))
             spinner.succeed("Arquivo " + file + " Gerado")
 
+    spinner.succeed("Arquivos gerados.")
     ziparchive(theme_name)
     spinner.stop()
 
@@ -70,13 +62,13 @@ def ziparchive(theme_name):
     # printing the list of all files to be zipped
     spinner_zip.info("Following files will be zipped:")
     for file_name in file_paths:
-        spinner_zip.info("Arquivo" + file_name + " OK")
+        spinner_zip.succeed("Arquivo" + file_name + " OK")
 
     # writing files to a zipfile
-    with ZipFile("./" + theme_name + ".zip", "w") as zip:
+    with ZipFile("./" + theme_name + ".zip", "w") as filezip:
         # writing each file one by one
         for file in file_paths:
-            zip.write(file)
+            filezip.write(file)
 
     spinner_zip.succeed("All files zipped successfully!")
 
