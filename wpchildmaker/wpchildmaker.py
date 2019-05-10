@@ -5,7 +5,6 @@ from zipfile import ZipFile
 
 import click
 import jinja2
-from halo import Halo
 
 
 @click.command()
@@ -14,8 +13,6 @@ from halo import Halo
 @click.option("--customer_site", prompt="url do site", help="ex. https://www.mulhergorila.com")
 @click.option("--template_name", prompt="Template name", help="ex. Divi", default="Divi")
 def make_child(child_name, customer_name, customer_site, template_name):
-    spinner = Halo(text="Loading", spinner="dots")
-    spinner.start()
 
     pathname = os.path.dirname(sys.argv[0])
     template_dir = os.path.abspath(pathname) + "/templates/" + template_name
@@ -32,25 +29,21 @@ def make_child(child_name, customer_name, customer_site, template_name):
     for file in template_files:
         if file.endswith(".jpg") or file.endswith(".png"):
             shutil.copy2(template_dir + "/" + file, directory)
-            spinner.succeed("Arquivo " + file + " Copiado")
         else:
             template_file = env.get_template(file)
             template_writer = open("mychilds/" + child_name + "/" + file, "w")
             template_writer.write(template_file.render(theme_name=child_name,
                                                        customer_name=customer_name,
                                                        customer_site=customer_site, ))
-            spinner.succeed("Arquivo " + file + " Gerado")
+            template_writer.close()
 
-    spinner.succeed("Arquivos gerados.")
     ziparchive(child_name)
-    spinner.stop()
 
 
 def ziparchive(theme_name):
     # initializing empty file paths list
     file_paths = []
     os.chdir("./mychilds/")
-    spinner_zip = Halo(text="Compactando arquivos", spinner="dots")
 
     # crawling through directory and subdirectories
     for root, directories, files in os.walk("./" + theme_name + "/"):
@@ -60,17 +53,17 @@ def ziparchive(theme_name):
             file_paths.append(filepath)
 
     # printing the list of all files to be zipped
-    spinner_zip.info("Following files will be zipped:")
+    print('Following files will be zipped:')
     for file_name in file_paths:
-        spinner_zip.succeed("Arquivo" + file_name + " OK")
+        print(file_name)
 
     # writing files to a zipfile
-    with ZipFile("./" + theme_name + ".zip", "w") as filezip:
+    with ZipFile('./' + theme_name + '.zip', 'w') as zipped:
         # writing each file one by one
         for file in file_paths:
-            filezip.write(file)
+            zipped.write(file)
 
-    spinner_zip.succeed("All files zipped successfully!")
+    print('All files zipped successfully!')
 
 
 if __name__ == "__main__":
